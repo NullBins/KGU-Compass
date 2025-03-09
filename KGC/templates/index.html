@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="| 경기 나침반 | KGU Compass |">
+    <meta property="og:description" content="경기대학교 정보를 한눈에!">
+    <meta property="og:image" content="">
+    <link rel="icon" type="image/png" href="">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>| 경기 나침반 | KGU Compass |</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<body>
+    <div class="main text-center py-4">
+        <div class="main-title">
+            <h1 class="fw-bold">🧭 경기 나침반 <span class="text-primary">KGU Compass</span> 📍</h1>
+            <p class="text-muted">필요한 정보를 쉽고 빠르게 찾으세요! 💡</p>
+        </div>
+        <!-- ### -->
+        <hr>
+        <!-- ### -->
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <label for="major_select" class="form-label">🎓 어느 학과를 찾으시나요?</label>
+                <select id="major_select" class="form-select">
+                    <option value="">- 학과 선택 - 📚</option>
+                    <option value="free_major">자유전공학부 🎨</option>
+                    <option value="computer_major">AI컴퓨터공학부 🤖</option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label for="info_select" class="form-label">📂 어떤 정보를 원하세요?</label>
+                <select id="info_select" class="form-select">
+                    <option value="">- 정보 선택 - 📝</option>
+                    <option value="plan">📅 학사 일정</option>
+                    <option value="award">🏆 장학금</option>
+                    <option value="course">📖 수강 신청</option>
+                    <option value="dorm">🏠 기숙사</option>
+                    <option value="commute">🚌 통학 정보</option>
+                    <option value="depart">📋 학과 정보</option>
+                </select>
+            </div>
+        </div>
+        <!-- ### -->
+        <div class="mt-4">
+            <button id="select_button" class="btn btn-primary btn-lg" onclick="navigate()">🔍 정보 확인하기</button>
+        </div>
+        <!-- ### -->
+        <br>
+        <!-- ### -->
+        <div id="notice">📢 최신 공지사항이 있습니다!</div>
+    </div>
+    <script>
+        // --- //
+        loadNotice();
+        // --- //
+        $(document).ready(function() {
+            showNotice();
+        });
+        // --- //
+        function navigate() {
+            let major = $('#major_select').val();
+            let info = $('#info_select').val();
+            console.log("전공: ", major, "찾을 정보: ", info);
+            if (major && info) {
+                window.location.href = `/infoPage?major=${major}&info=${info}`;
+            } else {
+                alert("📢 '학과'와 '정보'를 선택해주세요.");
+            }
+        }
+        // --- //
+        function showNotice() {
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "/showNotice",
+                    data: {},
+                    success: function(response) {
+                        let notice_title = response['recent_notice']['title_name'];
+                        let temp_html = `
+                            <p>📢 새로운 소식: <a href="https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=5133&bbsNo=680" target="_blank">${notice_title}</a></p>
+                        `;
+                        console.log("[경기대 새 공지사항]: ", notice_title);
+                        $('#notice').html(temp_html);
+                        $('#notice').show();
+                    },
+                    error: function() {
+                        alert('❌ 공지사항 로드 실패!');
+                    }
+                }
+            )
+        }
+        // --- //
+        function loadNotice() {
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "/notice",
+                    data: {},
+                    success: function() {
+                        console.log('✅ 경기대 데이터 불러오기 성공!');
+                    },
+                    error: function() {
+                        alert('❌ 데이터 불러오지 못함!');
+                    }
+                }
+            )
+        }
+    </script>
+</body>
+</html>
