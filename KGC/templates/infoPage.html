@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="| 경기 나침반 | KGU Compass |">
+    <meta property="og:description" content="경기대학교 정보를 한눈에!">
+    <meta property="og:image" content="">
+    <link rel="icon" type="image/png" href="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <title>| 경기 나침반 | KGU Compass | 정보 페이지 |</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sub.css') }}">
+<body>
+    <div id="result_title"></div>
+    <hr>
+    <div id="result_cal" style="display: none;"></div>
+    <div id="result_award" style="display: none;"></div>
+    <div id="result_course" style="display: none;"></div>
+    <div id="result_dorm" style="display: none;"></div>
+    <div id="result_commute" style="display: none;"></div>
+    <div id="result_depart" style="display: none;"></div>
+    <!-- ### -->
+    <script>
+        // --- //
+        loadPlan();
+        // --- //
+        $(document).ready(function() {
+            info_load();
+        });
+        // --- //
+        function info_load() {
+            let params = new URLSearchParams(window.location.search);
+            let major = params.get("major");
+            let info = params.get("info");
+            let major_name = "";
+            let info_name = "";
+            if (major && info) {
+                if (major === "computer_major") {
+                    major_name = "AI컴퓨터공학부";
+                } else if (major === "free_major") {
+                    major_name = "자유전공학부";
+                }
+                if (info === "plan") {
+                    info_name = "학사 일정";
+                    $("#result_cal").show();
+                    loadCalendar();
+                } else if (info === "award") {
+                    info_name = "장학금";
+                    $("#result_award").show();
+                    loadAward();
+                } else if (info === "course") {
+                    info_name = "수강 신청";
+                    $("#result_course").show();
+                    loadCourse();
+                } else if (info === "dorm") {
+                    info_name = "기숙사";
+                    $("#result_dorm").show();
+                    loadDorm();
+                } else if (info === "commute") {
+                    info_name = "통학";
+                    $("#result_commute").show();
+                    loadCommute();
+                } else if (info === "depart") {
+                    info_name = "학과";
+                    $("#result_depart").show();
+                    if (major === "free_major") {
+                        loadFree();
+                    } else if (major === "computer_major") {
+                        loadComputer();
+                    }
+                }
+                let temp_html = `
+                    <h1>📚 <strong style="color: navy;">${major_name}</strong>의 <strong style="color: lightskyblue;">${info_name}</strong> 📑 <span class="text-primary">정보</span></h1>
+                `;
+                $("#result_title").html(temp_html);
+            } else {
+                let temp_error_html = `
+                    <h1 style="color: red;">❌ 잘못된 접근입니다!!</h1>
+                `;
+                $("#result_title").html(temp_error_html);
+            }
+        }
+        // --- //
+        function loadAward() {
+            let temp_html = `
+            `;
+            $('#result_award').html(temp_html)
+        }
+        // --- //
+        function loadComputer() {
+            $.ajax({
+                type: "GET",
+                url: "/showComputer",
+                data: {},
+                success: function(response) {
+                    console.log(response)
+                    let sg_value = response.univ_depart.sg_value;
+                    let cg_value = response.univ_depart.cg_value;
+                    let temp_html = `
+                        <p>${sg_value[0]}</p>
+                        <p>${sg_value[1]}</p>
+                        <p>${sg_value[2]}</p>
+                        <p>${cg_value[1]}</p>
+                    `;
+                    $('#result_depart').html(temp_html)
+                },
+                error: function() {
+                    console.error('❌ 에러');
+                }
+            })
+        }
+        // --- //
+        function loadFree() {
+            $.ajax({
+                type: "GET",
+                url: "/showFree",
+                data: {},
+                success: function(response) {
+                    console.log(response)
+                    let sg_value = response.univ_depart.sg_value;
+                    let temp_html = `
+                        <p>${sg_value[0]}</p>
+                        <p>경계를 넘어 다양한 지식과 정보를 연계하고 통합적으로 사고하여 새롭고 의미 있는 가치를 창출하는 능력</p>
+                        <p>급변하는 사회적, 문화적 환경 안에서 유연하게 대처하고 적응할 수 있는 능력</p>
+                        <p>자신과 환경에 대한 이해를 바탕으로 하여 주체적으로 자신의 삶을 설계하고 이를 실행할 수 있는 능력</p>
+                        <p>자신의 진로와 직업을 스스로 결정하고 지속적인 성장과 적응을 위해 계획하고 실천하는 능력</p>
+                    `;
+                    $('#result_depart').html(temp_html)
+                },
+                error: function() {
+                    console.error('❌ 에러');
+                }
+            })
+        }
+        // --- //
+        function loadCommute() {
+            let temp_html = `
+                <h1>- 경기대 통학 정보 -</h1>
+                <hr>
+                <h3>등교 운행노선</h3>
+                <h5>- | 부평(노선) | 구올담치과병원 건너편 세븐일레븐 부평파라움점앞(출발지) | 6:30(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 부평(노선) | 부평지하상가 | 10번출구 앞(출발지) | 13:00(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 주안(노선) | 주안역 남광장 우리주차장(출발지) | 6:50(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 송내(노선) | 송내 남광장(출발지) | 6:50(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 강서(노선) | 송정역(출발지) | 6:40(출발시간) | 3,000원(승차요금) |</h5>
+                <h5>- | 일산(노선) | 정발산역[2번출구](출발지) | 6:30(출발시간) | 3,000원(승차요금) |</h5>
+                <h5>- | 중앙역(노선) | 중앙역[예술대학승강장 앞](출발지) | 7:30(출발시간) | 2,800원(승차요금) |</h5>
+                <h5>- | 상록수역(노선) | 상록수역[안산 1대학 승강장 앞](출발지) | 7:40(출발시간) | 2,800원(승차요금) |</h5>
+                <h5>- | 안양(노선) | 범계사거리[전국낙지자랑 소망자원 앞 버스정류장](출발지) | 7:35(출발시간) | 2,500원(승차요금) |</h5>
+                <h5>- | 신도림역(노선) | 신도림역[테크노마트광장 출입구](출발지) | 7:10(출발시간) | 3,000원(승차요금) |</h5>
+                <hr>
+                <h3>하교 운행노선</h3>
+                <h5>- | 부평,송내(노선) | 12:00(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 부평,송내(노선) | 16:30(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 부평,송내(노선) | 17:10(출발시간) | 3,500원(승차요금) |</h5>
+                <h5>- | 이수역(노선) | 16:30(출발시간) | 2,800원(승차요금) |</h5>
+                <h5>- | 이수역(노선) | 17:10(출발시간) | 2,800원(승차요금) |</h5>
+                <h5>- | 안산(노선) | 17:10(출발시간) | 2,800원(승차요금) |</h5>
+                <h5>- | 강서(노선) | 17:10(출발시간) | 3,000원(승차요금) |</h5>
+            `;
+            $('#result_commute').html(temp_html)
+        }
+        // --- //
+        $(document).ready(function () {
+            let app = $("#result_award");
+            app.append('<label for="entry-type">입학 유형을 선택하세요 (수시/정시): </label>');
+            app.append('<select id="entry-type">' +
+                '<option value="">--선택--</option>' +
+                '<option value="수시">수시</option>' +
+                '<option value="정시">정시</option>' +
+                '</select>');
+            app.append('<div id="extra-options" style="display: none;">' +
+                '<br>' +
+                '<label for="grade-type">등급 유형을 선택하세요: </label>' +
+                '<select id="grade-type">' +
+                '<option value="">--선택--</option>' +
+                '<option value="A">A</option>' +
+                '<option value="B">B</option>' +
+                '</select>' +
+                '<br><br>' +
+                '<label for="subject-type">계열 유형을 선택하세요: </label>' +
+                '<select id="subject-type">' +
+                '<option value="">--선택--</option>' +
+                '<option value="인문계, 예체능계">인문계, 예체능계</option>' +
+                '<option value="자연계">자연계</option>' +
+                '</select>' +
+                '<br><br>' +
+                '<label for="average-grade">평균 등급을 입력하세요: </label>' +
+                '<input type="text" id="average-grade" placeholder="예: 1.75">' +
+                '</div>');
+            app.append('<br><button id="submit-btn">장학금 찾기</button>');
+            app.append('<hr><h2>- 장학금 결과 -</h2><div id="result"></div>');
+            $('#entry-type').on('change', function () {
+                if ($(this).val() !== "") {
+                    $('#extra-options').show();
+                } else {
+                    $('#extra-options').hide();
+                }
+            });
+            $('#submit-btn').on('click', function () {
+                const entryType = $('#entry-type').val();
+                const gradeType = $('#grade-type').val();
+                const subjectType = $('#subject-type').val();
+                const averageGrade = parseFloat($('#average-grade').val());
+                let result = "";
+                if (entryType === "수시") {
+                    if (gradeType === "A" && subjectType === "인문계, 예체능계" && averageGrade <= 1.5) {
+                        result = "수시우수 장학금(A): 수혜기간 2년";
+                    } else if (gradeType === "B" && subjectType === "인문계, 예체능계" && averageGrade <= 1.75) {
+                        result = "수시우수 장학금(B): 수혜기간 1년";
+                    } else if (gradeType === "A" && subjectType === "자연계" && averageGrade <= 1.75) {
+                        result = "수시우수 장학금(A): 수혜기간 2년";
+                    } else if (gradeType === "B" && subjectType === "자연계" && averageGrade <= 2.0) {
+                        result = "수시우수 장학금(B): 수혜기간 1년";
+                    } else {
+                        result = "수시에 해당하는 장학금을 찾을 수 없습니다.";
+                    }
+                } else if (entryType === "정시") {
+                    if (gradeType === "A" && subjectType === "인문계, 예체능계" && averageGrade <= 1.5) {
+                        result = "정시 총장 장학금(A): 수혜기간 2년";
+                    } else if (gradeType === "B" && subjectType === "인문계, 예체능계" && averageGrade <= 1.75) {
+                        result = "정시 총장 장학금(B): 수혜기간 1년";
+                    } else if (gradeType === "A" && subjectType === "자연계" && averageGrade <= 1.75) {
+                        result = "정시 총장 장학금(A): 수혜기간 2년";
+                    } else if (gradeType === "B" && subjectType === "자연계" && averageGrade <= 2.0) {
+                        result = "정시 총장 장학금(B): 수혜기간 1년";
+                    } else {
+                        result = "정시에 해당하는 장학금을 찾을 수 없습니다.";
+                    }
+                } else {
+                    result = "모든 필수 항목을 선택해주세요.";
+                }
+                $('#result').html(result + '<br><br><a href="https://www.kyonggi.ac.kr/scholarship/contents.do?key=3067">- 정확한 장학금 확인하기 - 경기대학교 장학지원 사이트</a>');
+            });
+        });
+        // --- //
+        function loadDorm() {
+            let temp_html = `
+                <h1>- 경기대 기숙사 신청(경기드림타워) -</h1>
+                <iframe src="https://dorm.kyonggi.ac.kr/" style="width: 100%; height: calc(100vh - 150px); border: none; sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+            `;
+            $('#result_dorm').html(temp_html)
+        }
+        // --- //
+        function loadCourse() {
+            let temp_html = `
+                <h1>- 경기대 예비 수강신청(경기타임) - </h1>
+                <iframe src="https://kyonggiti.me/" style="width: 100%; height: calc(100vh - 150px); border: none; sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+            `;
+            $('#result_course').html(temp_html)
+        }
+        // --- //
+        function loadCalendar() {
+            var calendarEl = $('#result_cal')[0];
+            $.ajax({
+                url: '/showPlan',
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        events: data.univ_plan.map(event => ({
+                                title: event.data_text,
+                                start: event.start_date,
+                                end: event.end_date,
+                                color: getEventColor(event.start_date)
+                        })),
+                        eventDisplay: 'block'
+                    });
+                    calendar.render();
+                },
+                error: function() {
+                    console.error('❌ 에러');
+                }
+            });
+            $.ajax ({
+                url: '/showPlan',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    let data = response.univ_plan;
+                    let random_date1 = Math.floor((Math.random() * (10 - 0) + 1))
+                    let random_date2 = Math.floor((Math.random() * (10 - 0) + 1))
+                    const today = new Date();
+                    const targetDate1 = new Date('2025-02-24');
+                    const diffTime1 = targetDate1 - today;
+                    const diffDays1 = Math.ceil(diffTime1 / (1000 * 60 * 60 * 24));
+                    const targetDate2 = new Date('2025-03-04');
+                    const diffTime2 = targetDate2 - today;
+                    const diffDays2 = Math.ceil(diffTime2 / (1000 * 60 * 60 * 24));
+                    let temp_info_html = `
+                        <hr>
+                        <p style="text-align: center;">📣 <b>중요할 것 같아요!</b> :
+                        <br> - <span style="color: blue;">${data[random_date1].data_text}</span>
+                        <br> - <span style="color: blue;">${data[random_date2].data_text}</span>
+                        </p>
+                        <p style="text-align: center;">📅 <b>중요한 일정을 알려드려요!</b> :
+                        <br> - <span">신입생 수강 신청 : <b style="color: red;">D-${diffDays1}</b></span>
+                        <br> - <span">1학기 개강일 : <b style="color: red;">D-${diffDays2}</b></span>
+                        </p>
+                    `;
+                    $('#result_cal').append(temp_info_html)
+                },
+                error: function() {
+                    console.error('❌ 에러');
+                }
+            })
+        }
+        // --- //
+        function getEventColor(date) {
+            const month = new Date(date).getMonth();
+            const colors = [
+                '#FF9999', // 1월 //
+                '#FFB366', // 2월 //
+                '#FFFF99', // 3월 //
+                '#99FF99', // 4월 //
+                '#99FFFF', // 5월 //
+                '#9999FF', // 6월 //
+                '#FF99FF', // 7월 //
+                '#FF99CC', // 8월 //
+                '#FFCC99', // 9월 //
+                '#99CCFF', // 10월 //
+                '#CC99FF', // 11월 //
+                '#FF9999'  // 12월 //
+            ];
+            return colors[month];
+        }
+        // --- //
+        function loadPlan() {
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "/plan",
+                    data: {},
+                    success: function() {
+                        console.log('✅ 경기대 데이터 불러오기 성공!');
+                    },
+                    error: function() {
+                        alert('❌ 데이터 불러오지 못함!');
+                    }
+                }
+            )
+        }
+    </script>
+</body>
+</html>
