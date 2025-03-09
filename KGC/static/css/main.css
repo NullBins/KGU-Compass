@@ -1,0 +1,102 @@
+/* 공통 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+}
+
+p, label, select, button {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* 메인 페이지 스타일 */
+.main {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+.main-title h1 {
+    font-size: 2.5rem;
+    color: #4a90e2;
+    margin-bottom: 10px;
+}
+
+.main-title p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+select {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+}
+
+button {
+    background-color: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #357abd;
+}
+
+#notice {
+    padding: 10px;
+    background-color: #fff4e6;
+    border: 1px solid #ffd7b5;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #d35400;
+}
+
+/* 정보 페이지 스타일 */
+#result_title {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 2rem;
+    color: #4a90e2;
+}
+
+#result_title strong {
+    font-weight: 700;
+}
+
+#result_cal, #result_award, #result_course, #result_dorm, #result_commute, #result_depart {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 900px;
+    font-size: 1rem;
+    color: #333;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    margin: 20px 0;
+}
